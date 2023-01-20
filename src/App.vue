@@ -8,22 +8,40 @@
 import Chart, { ChartItem } from 'chart.js/auto'
 import { Transaction } from "./types";
 import json from './data.json'
-import { dateRange, monthNames } from "./helpers";
-import { getCurrentInstance, onMounted, ref } from "vue";
+import { dateRange, formatDate, monthNames } from "./helpers";
+import { getCurrentInstance, onMounted } from "vue";
+import { MonthData } from "./types";
 
 const proxy = getCurrentInstance()!.proxy!;
 
 const jsonfile = json;
 
-const transactions = jsonfile.Transactions as Array<Transaction>;
+const transactions = jsonfile.Transactions.map((t) => {
+  return { ...t, Date: new Date(t.Date) }
+}) as Array<Transaction>;
 const minDate = transactions.reduce((prev, curr) => prev.Date < curr.Date ? prev : curr).Date;
 const maxDate = transactions.reduce((prev, curr) => prev.Date > curr.Date ? prev : curr).Date;
-console.log(minDate, maxDate);
-console.log(dateRange(minDate, maxDate))
+let dates = dateRange(minDate, maxDate)
+let months: { [id: string]: MonthData } = {}
+
+dates.forEach((d) => {
+  months[formatDate(d)] = { date: d, total: 0 };
+})
+
+transactions.forEach((t: Transaction) => {
+  months[formatDate(t.Date)].total += t.Amount
+})
+
+let data: MonthData[] = [];
+for (const [_, monthData] of Object.entries(months)) {
+  data.push(monthData);
+}
+data.sort((x, y) => x.date > y.date ? 1 : -1);
+console.log(data)
 
 const chartData = {
-  labels: [...dateRange(minDate, maxDate).map(date=>`${monthNames[date.getMonth()]} ${date.getFullYear().toString().slice(2)}`)],
-  datasets: [{ data: transactions }]
+  labels: [...dates.map(date => formatDate(date))],
+  datasets: [{ label: 'Totals', data: data.map(d => d.total) }]
 }
 
 onMounted(() => {

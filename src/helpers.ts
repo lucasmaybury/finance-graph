@@ -19,3 +19,7 @@ export function dateRange(startDate: Date, endDate: Date): Array<Date> {
 export const monthNames = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ];
+
+export function formatDate(date: Date): string {
+  return `${monthNames[date.getMonth()]} ${date.getFullYear().toString().slice(2)}`
+}

@@ -1,11 +1,15 @@
 ﻿export interface Transaction {
-  Account: String,
+  Account: string,
   Date: Date,
-  CurrentDescription: String,
-  OriginalDescription: String,
+  CurrentDescription: string,
+  OriginalDescription: string,
   Amount: number,
-  L1Tag: String,
-  L2Tag: String,
-  L3Tag: String,
-} 
+  L1Tag: string,
+  L2Tag: string,
+  L3Tag: string,
+}
 
+export interface MonthData {
+  date: Date,
+  total: number
+}
